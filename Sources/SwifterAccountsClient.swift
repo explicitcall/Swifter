@@ -24,6 +24,8 @@
 //
 
 import Foundation
+
+#if os(iOS) || os(macOS)
 import Accounts
 import Social
 
@@ -39,7 +41,7 @@ internal class AccountsClient: SwifterClientProtocol {
         let url = URL(string: path, relativeTo: baseURL.url)
 
         let stringifiedParameters = parameters.stringifiedDictionary()
-        
+
         let socialRequest = SLRequest(forServiceType: SLServiceTypeTwitter, requestMethod: .GET, url: url, parameters: stringifiedParameters)!
         socialRequest.account = self.credential!.account!
 
@@ -48,7 +50,7 @@ internal class AccountsClient: SwifterClientProtocol {
         request.downloadProgressHandler = downloadProgress
         request.successHandler = success
         request.failureHandler = failure
-        
+
         request.start()
         return request
     }
@@ -57,14 +59,14 @@ internal class AccountsClient: SwifterClientProtocol {
         let url = URL(string: path, relativeTo: baseURL.url)
 
         var params = parameters
-        
+
         var postData: Data?
         var postDataKey: String?
 
         if let keyString = params[Swifter.DataParameters.dataKey] as? String {
             postDataKey = keyString
             postData = params[postDataKey!] as? Data
-            
+
             params.removeValue(forKey: Swifter.DataParameters.dataKey)
             params.removeValue(forKey: postDataKey!)
         }
@@ -90,9 +92,10 @@ internal class AccountsClient: SwifterClientProtocol {
         request.downloadProgressHandler = downloadProgress
         request.successHandler = success
         request.failureHandler = failure
-        
+
         request.start()
         return request
     }
 
 }
+#endif

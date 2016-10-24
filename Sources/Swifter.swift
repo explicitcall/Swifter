@@ -24,7 +24,10 @@
 //
 
 import Foundation
+
+#if os(iOS) || os(macOS)
 import Accounts
+#endif
 
 extension Notification.Name {
     static let SwifterCallbackNotification: Notification.Name = Notification.Name(rawValue: "SwifterCallbackNotificationName")
@@ -38,7 +41,7 @@ public enum TwitterURL {
     case userStream
     case siteStream
     case oauth
-    
+
     var url: URL {
         switch self {
         case .api:          return URL(string: "https://api.twitter.com/1.1/")!
@@ -49,11 +52,11 @@ public enum TwitterURL {
         case .oauth:        return URL(string: "https://api.twitter.com/")!
         }
     }
-    
+
 }
 
 public class Swifter {
-    
+
     // MARK: - Types
 
     public typealias SuccessHandler = (JSON) -> Void
@@ -64,18 +67,18 @@ public class Swifter {
     internal struct CallbackNotification {
         static let optionsURLKey = "SwifterCallbackNotificationOptionsURLKey"
     }
-    
+
     internal struct DataParameters {
         static let dataKey = "SwifterDataParameterKey"
         static let fileNameKey = "SwifterDataParameterFilename"
     }
 
     // MARK: - Properties
-    
+
     public var client: SwifterClientProtocol
 
     // MARK: - Initializers
-    
+
     public init(consumerKey: String, consumerSecret: String, appOnly: Bool = false) {
         self.client = appOnly
             ? AppOnlyClient(consumerKey: consumerKey, consumerSecret: consumerSecret)
@@ -86,33 +89,36 @@ public class Swifter {
         self.client = OAuthClient(consumerKey: consumerKey, consumerSecret: consumerSecret , accessToken: oauthToken, accessTokenSecret: oauthTokenSecret)
     }
 
+
+#if os(iOS) || os(macOS)
     public init(account: ACAccount) {
         self.client = AccountsClient(account: account)
     }
+#endif
 
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
     // MARK: - JSON Requests
-    
+
     @discardableResult
     internal func jsonRequest(path: String, baseURL: TwitterURL, method: HTTPMethodType, parameters: Dictionary<String, Any>, uploadProgress: HTTPRequest.UploadProgressHandler? = nil, downloadProgress: JSONSuccessHandler? = nil, success: JSONSuccessHandler? = nil, failure: HTTPRequest.FailureHandler? = nil) -> HTTPRequest {
         let jsonDownloadProgressHandler: HTTPRequest.DownloadProgressHandler = { data, _, _, response in
 
             guard let _ = downloadProgress else { return }
-            
+
             guard let jsonResult = try? JSON.parse(jsonData: data) else {
                 let jsonString = String(data: data, encoding: .utf8)
                 let jsonChunks = jsonString!.components(separatedBy: "\r\n")
-                
+
                 for chunk in jsonChunks where !chunk.utf16.isEmpty {
                     guard let chunkData = chunk.data(using: .utf8), let jsonResult = try? JSON.parse(jsonData: chunkData) else { continue }
                     downloadProgress?(jsonResult, response)
                 }
                 return
             }
-            
+
             downloadProgress?(jsonResult, response)
         }
 
@@ -148,5 +154,5 @@ public class Swifter {
     internal func postJSON(path: String, baseURL: TwitterURL, parameters: Dictionary<String, Any>, uploadProgress: HTTPRequest.UploadProgressHandler? = nil, downloadProgress: JSONSuccessHandler? = nil, success: JSONSuccessHandler?, failure: HTTPRequest.FailureHandler?) -> HTTPRequest {
         return self.jsonRequest(path: path, baseURL: baseURL, method: .POST, parameters: parameters, uploadProgress: uploadProgress, downloadProgress: downloadProgress, success: success, failure: failure)
     }
-    
+
 }

@@ -20,7 +20,7 @@ Temporary Items
 .apdisk
 
 # Xcode
-# 
+#
 build/
 *.pbxuser
 !default.pbxuser
@@ -37,4 +37,4 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-
+.build

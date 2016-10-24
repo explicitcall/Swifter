@@ -1,5 +1,5 @@
 //
-//  Credential.swift
+//  SwifterClientProtocol.swift
 //  Swifter
 //
 //  Copyright (c) 2014 Matt Donnelly.
@@ -24,45 +24,20 @@
 //
 
 import Foundation
+
+#if os(iOS) || os(macOS)
 import Accounts
+import Social
+#endif
 
-public class Credential {
+public protocol SwifterClientProtocol {
 
-    public struct OAuthAccessToken {
+    var credential: Credential? { get set }
 
-        public internal(set) var key: String
-        public internal(set) var secret: String
-        public internal(set) var verifier: String?
+    @discardableResult
+    func get(_ path: String, baseURL: TwitterURL, parameters: Dictionary<String, Any>, uploadProgress: HTTPRequest.UploadProgressHandler?, downloadProgress: HTTPRequest.DownloadProgressHandler?, success: HTTPRequest.SuccessHandler?, failure: HTTPRequest.FailureHandler?) -> HTTPRequest
 
-        public internal(set) var screenName: String?
-        public internal(set) var userID: String?
-
-        public init(key: String, secret: String) {
-            self.key = key
-            self.secret = secret
-        }
-
-        public init(queryString: String) {
-            var attributes = queryString.queryStringParameters
-
-            self.key = attributes["oauth_token"]!
-            self.secret = attributes["oauth_token_secret"]!
-
-            self.screenName = attributes["screen_name"]
-            self.userID = attributes["user_id"]
-        }
-        
-    }
-
-    public internal(set) var accessToken: OAuthAccessToken?
-    public internal(set) var account: ACAccount?
-
-    public init(accessToken: OAuthAccessToken) {
-        self.accessToken = accessToken
-    }
-
-    public init(account: ACAccount) {
-        self.account = account
-    }
+    @discardableResult
+    func post(_ path: String, baseURL: TwitterURL, parameters: Dictionary<String, Any>, uploadProgress: HTTPRequest.UploadProgressHandler?, downloadProgress: HTTPRequest.DownloadProgressHandler?, success: HTTPRequest.SuccessHandler?, failure: HTTPRequest.FailureHandler?) -> HTTPRequest
 
 }

@@ -24,7 +24,11 @@
 //
 
 import Foundation
+
+
+#if os(iOS) || os(macOS)
 import Accounts
+#endif
 
 internal class OAuthClient: SwifterClientProtocol  {
 
@@ -69,7 +73,7 @@ internal class OAuthClient: SwifterClientProtocol  {
 
     func post(_ path: String, baseURL: TwitterURL, parameters: Dictionary<String, Any>, uploadProgress: HTTPRequest.UploadProgressHandler?, downloadProgress: HTTPRequest.DownloadProgressHandler?, success: HTTPRequest.SuccessHandler?, failure: HTTPRequest.FailureHandler?) -> HTTPRequest {
         let url = URL(string: path, relativeTo: baseURL.url)!
-        
+
         var parameters = parameters
         var postData: Data?
         var postDataKey: String?
@@ -151,11 +155,11 @@ internal class OAuthClient: SwifterClientProtocol  {
         let encodedParameterString = parameterString.urlEncodedString()
         let encodedURL = url.absoluteString.urlEncodedString()
         let signatureBaseString = "\(method)&\(encodedURL)&\(encodedParameterString)"
-        
+
         let key = signingKey.data(using: .utf8)!
         let msg = signatureBaseString.data(using: .utf8)!
         let sha1 = HMAC.sha1(key: key, message: msg)!
         return sha1.base64EncodedString(options: [])
     }
-    
+
 }

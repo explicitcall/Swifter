@@ -27,7 +27,7 @@ import Foundation
 
 #if os(iOS)
     import UIKit
-#else
+#elseif os(macOS)
     import AppKit
 #endif
 
@@ -98,8 +98,8 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
     }
 
     public func start() {
-        
-        
+
+
         if request == nil {
             self.request = URLRequest(url: self.url)
             self.request!.httpMethod = self.HTTPMethod.rawValue
@@ -109,7 +109,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
             for (key, value) in headers {
                 self.request!.setValue(value, forHTTPHeaderField: key)
             }
-            
+
             let charset = CFStringConvertEncodingToIANACharSetName(CFStringConvertNSStringEncodingToEncoding(self.dataEncoding.rawValue))
 
             let nonOAuthParameters = self.parameters.filter { key, _ in !key.hasPrefix("oauth_") }
@@ -163,7 +163,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
             let session = URLSession(configuration: .default, delegate: self, delegateQueue: .main)
             self.dataTask = session.dataTask(with: self.request!)
             self.dataTask.resume()
-            
+
             #if os(iOS)
                 UIApplication.shared.isNetworkActivityIndicatorVisible = true
             #endif
@@ -183,7 +183,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
         let mimeType = mimeTypeOrNil ?? "application/octet-stream"
         let fileNameContentDisposition = fileName != nil ? "filename=\"\(fileName)\"" : ""
         let contentDisposition = "Content-Disposition: form-data; name=\"\(parameterName)\"; \(fileNameContentDisposition)\r\n"
-        
+
         var tempData = Data()
         tempData.append("--\(boundary)\r\n".data(using: .utf8)!)
         tempData.append(contentDisposition.data(using: .utf8)!)
@@ -194,7 +194,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
     }
 
     // MARK: - URLSessionDataDelegate
-    
+
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         #if os(iOS)
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -204,7 +204,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
             self.failureHandler?(error)
             return
         }
-        
+
         guard self.response.statusCode >= 400 else {
             self.successHandler?(self.responseData, self.response)
             return
@@ -212,31 +212,31 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
         let responseString = String(data: responseData, encoding: dataEncoding)!
         let errorCode = HTTPRequest.responseErrorCode(for: responseData) ?? 0
         let localizedDescription = HTTPRequest.description(for: response.statusCode, response: responseString)
-        
+
         let error = SwifterError(message: localizedDescription, kind: .urlResponseError(status: response.statusCode, headers: response.allHeaderFields as [NSObject : AnyObject], errorCode: errorCode))
         self.failureHandler?(error)
     }
-    
+
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         self.responseData.append(data)
-        
+
         let expectedContentLength = Int(self.response!.expectedContentLength)
         let totalBytesReceived = self.responseData.count
-        
+
         guard !data.isEmpty else { return }
         self.downloadProgressHandler?(data, totalBytesReceived, expectedContentLength, self.response)
     }
-    
+
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         self.response = response as? HTTPURLResponse
         self.responseData.count = 0
         completionHandler(.allow)
     }
-    
+
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         self.uploadProgressHandler?(Int(bytesSent), Int(totalBytesSent), Int(totalBytesExpectedToSend))
     }
-    
+
     // MARK: - Error Responses
 
     class func responseErrorCode(for data: Data) -> Int? {
@@ -248,9 +248,9 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
 
     class func description(for status: Int, response string: String) -> String {
         var s = "HTTP Status \(status)"
-        
+
         let description: String
-        
+
         // http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
         // https://dev.twitter.com/overview/api/response-codes
         switch(status) {
@@ -298,11 +298,11 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
         case 511:	description = "Network Authentication Required"
         default:    description = ""
         }
-        
+
         if !description.isEmpty {
             s = s + ": " + description + ", Response: " + string
         }
-        
+
         return s
     }
 }
