@@ -396,7 +396,8 @@
 				F6B4D5771C7BAC4500E06514 /* SwifterTests.swift */,
 				F6B4D5791C7BAC4500E06514 /* Info.plist */,
 			);
-			path = SwifterTests;
+			name = SwifterTests;
+			path = Tests/SwifterTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1014,7 +1015,7 @@
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = SwifterTests/Info.plist;
+				INFOPLIST_FILE = Tests/SwifterTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1030,7 +1031,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = SwifterTests/Info.plist;
+				INFOPLIST_FILE = Tests/SwifterTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;

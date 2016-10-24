@@ -8,7 +8,13 @@
 
 import XCTest
 
-@testable import SwifteriOS
+#if os(Linux)
+  @testable import Swifter
+#elseif os(iOS)
+  @testable import SwifteriOS
+#elseif os(macOS)
+  @testable import SwifterMac
+#endif
 
 class String_SwifterTests: XCTestCase {
     
@@ -68,4 +74,8 @@ class String_SwifterTests: XCTestCase {
     }
 
 
+    static var allTests = [
+      ("testEncoding", testEncoding),
+      // Other tests go here
+    ]
 }

@@ -8,7 +8,13 @@
 
 import XCTest
 
+#if os(Linux)
+@testable import Swifter
+#elseif os(iOS)
 @testable import SwifteriOS
+#elseif os(macOS)
+@testable import SwifterMac
+#endif
 
 class SHA1Tests: XCTestCase {
   override func setUp() {
@@ -30,4 +36,9 @@ class SHA1Tests: XCTestCase {
 
     XCTAssertEqual(result.base64EncodedString(), "SYg7NOWg9IIk3WIw9HHp3Bvb6vU=")
   }
+
+  static var allTests = [
+      ("testCalculate", testCalculate),
+      // Other tests go here
+    ]
 }
