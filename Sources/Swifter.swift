@@ -44,7 +44,7 @@ public enum TwitterURL {
     case siteStream
     case oauth
 
-    var url: URL {
+    public var url: URL {
         switch self {
         case .api:          return URL(string: "https://api.twitter.com/1.1/")!
         case .upload:       return URL(string: "https://upload.twitter.com/1.1/")!
@@ -78,6 +78,7 @@ public class Swifter {
     // MARK: - Properties
 
     public var client: SwifterClientProtocol
+    public var callbackQueue = DispatchQueue.main
 
     // MARK: - Initializers
 
@@ -129,11 +130,11 @@ public class Swifter {
             DispatchQueue.global(qos: .utility).async {
                 do {
                     let jsonResult = try JSON.parse(jsonData: data)
-                    DispatchQueue.main.async {
+                    self.callbackQueue.async {
                         success?(jsonResult, response)
                     }
                 } catch {
-                    DispatchQueue.main.async {
+                    self.callbackQueue.async {
                         failure?(error)
                     }
                 }
