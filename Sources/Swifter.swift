@@ -27,6 +27,8 @@ import Foundation
 
 #if os(iOS) || os(macOS)
 import Accounts
+#elseif os(Linux)
+import Dispatch
 #endif
 
 extension Notification.Name {

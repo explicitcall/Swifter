@@ -29,6 +29,8 @@ import Foundation
     import UIKit
 #elseif os(macOS)
     import AppKit
+#elseif os(Linux)
+    import Dispatch
 #endif
 
 public enum HTTPMethodType: String {
