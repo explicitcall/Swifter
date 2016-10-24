@@ -41,7 +41,7 @@ extension String {
             return self[startIndex..<endIndex]
         }
     }
-    
+
 
     func urlEncodedString(_ encodeAll: Bool = false) -> String {
         var allowedCharacterSet: CharacterSet = .urlQueryAllowed
@@ -57,25 +57,42 @@ extension String {
 
         let scanner = Scanner(string: self)
 
-        var key: NSString?
-        var value: NSString?
+        func finished() -> Bool {
+#if os(Linux)
+          return scanner.atEnd
+#else
+          return scanner.isAtEnd
+#endif
+        }
 
-        while !scanner.isAtEnd {
-            key = nil
+        while !finished() {
+#if os(Linux)
+            let key = scanner.scanUpToString("=")
+            let _ = scanner.scanString(string: "=")
+
+            let value = scanner.scanUpToString("&")
+            let _ = scanner.scanString(string: "&")
+
+            if let key = key, let value = value {
+              parameters.updateValue(value, forKey: key)
+            }
+#else
+            var key: NSString? = nil
+
             scanner.scanUpTo("=", into: &key)
             scanner.scanString("=", into: nil)
 
-            value = nil
+            var value: NSString? = nil
             scanner.scanUpTo("&", into: &value)
             scanner.scanString("&", into: nil)
 
             if let key = key as? String, let value = value as? String {
-                parameters.updateValue(value, forKey: key)
+              parameters.updateValue(value, forKey: key)
             }
+#endif
         }
-        
+
         return parameters
     }
 
 }
-

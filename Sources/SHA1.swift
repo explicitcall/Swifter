@@ -9,8 +9,7 @@
 import Foundation
 
 struct SHA1 {
-    
-    var message: Data
+    let message: Data
     
     /** Common part for hash calculation. Prepare header data. */
     func prepare(_ len:Int = 64) -> Data {
@@ -62,9 +61,9 @@ struct SHA1 {
             for x in 0..<M.count {
                 switch (x) {
                 case 0...15:
-                    var le: UInt32 = 0
-                    let range = NSRange(location:x * MemoryLayout<UInt32>.size, length: MemoryLayout<UInt32>.size)
-                    (chunk as NSData).getBytes(&le, range: range)
+                    let le = chunk.withUnsafeBytes { (pointer: UnsafePointer<UInt32>) in
+                      return pointer.advanced(by: x).pointee
+                    }
                     M[x] = le.bigEndian
                     break
                 default:
@@ -115,18 +114,19 @@ struct SHA1 {
             hh[2] = (hh[2] &+ C) & 0xffffffff
             hh[3] = (hh[3] &+ D) & 0xffffffff
             hh[4] = (hh[4] &+ E) & 0xffffffff
-			
+
             i = i + chunkSizeBytes
             leftMessageBytes -= chunkSizeBytes
         }
         
         // Produce the final hash value (big-endian) as a 160 bit number:
-        let mutableBuff = NSMutableData()
+        var mutableBuff = Data()
         hh.forEach {
             var i = $0.bigEndian
-            mutableBuff.append(&i, length: MemoryLayout<UInt32>.size)
+            let pointer = UnsafeBufferPointer(start: &i, count: 1)
+            mutableBuff.append(pointer)
         }
         
-        return mutableBuff as Data
+        return mutableBuff
     }
 }

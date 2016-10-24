@@ -24,6 +24,7 @@
 //
 
 import Foundation
+import CoreFoundation
 
 #if os(iOS)
     import UIKit
@@ -215,7 +216,7 @@ public class HTTPRequest: NSObject, URLSessionDataDelegate {
         let errorCode = HTTPRequest.responseErrorCode(for: responseData) ?? 0
         let localizedDescription = HTTPRequest.description(for: response.statusCode, response: responseString)
 
-        let error = SwifterError(message: localizedDescription, kind: .urlResponseError(status: response.statusCode, headers: response.allHeaderFields as [NSObject : AnyObject], errorCode: errorCode))
+        let error = SwifterError(message: localizedDescription, kind: .urlResponseError(status: response.statusCode, headers: response.allHeaderFields, errorCode: errorCode))
         self.failureHandler?(error)
     }
 

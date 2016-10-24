@@ -58,12 +58,12 @@ class String_SwifterTests: XCTestCase {
         ]
         
         for (input, output) in shouldBeTheSameAfterEncoding {
-            XCTAssertEqual(input.urlEncodedStringWithEncoding(), output, input)
+            XCTAssertEqual(input.urlEncodedString(), output, input)
         }
 
         
         for (input, output) in shouldBeDifferentAfterEcoding {
-            XCTAssertNotEqual(input.urlEncodedStringWithEncoding(), output)
+            XCTAssertNotEqual(input.urlEncodedString(), output)
         }
     }
 
